@@ -74,3 +74,5 @@ curl -X POST https://seudominio.netlify.app/.netlify/functions/db-setup
 - ✅ **Migração opcional para online**
 
 **Não precisa configurar nada - já funciona!** 🌱📊
+
+

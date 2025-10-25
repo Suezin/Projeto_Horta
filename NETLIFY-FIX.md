@@ -111,3 +111,5 @@ netlify dev
 - ✅ **Sistema híbrido** funcionando
 
 **Não deve mais haver erros de conexão!** 🌱📊
+
+

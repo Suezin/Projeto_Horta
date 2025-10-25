@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Carregamento de Postagens</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .post {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .post-image {
+            max-width: 200px;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4a7c59;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #3a6b49;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Carregamento de Postagens</h1>
+        
+        <div id="testResults"></div>
+        
+        <button onclick="testPostsLoading()">Testar Carregamento</button>
+        <button onclick="clearResults()">Limpar Resultados</button>
+        
+        <div id="postsContainer"></div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        function showResult(message, type = 'success') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('postsContainer').innerHTML = '';
+        }
+
+        // Transform API data to frontend format (same as in script.js)
+        function transformPostData(apiPost) {
+            return {
+                id: apiPost.id,
+                plantType: apiPost.plant_type,
+                plantAge: apiPost.plant_age,
+                plantingDate: apiPost.planting_date,
+                height: apiPost.height,
+                weather: apiPost.weather,
+                temperature: apiPost.temperature,
+                watering: apiPost.watering,
+                fertilizer: apiPost.fertilizer,
+                pestProblems: apiPost.pest_problems,
+                notes: apiPost.notes,
+                expectedHarvest: apiPost.expected_harvest,
+                author: apiPost.author,
+                date: apiPost.created_at,
+                images: apiPost.images ? apiPost.images.map(img => ({
+                    id: img.id,
+                    name: img.filename,
+                    url: img.url || `data:${img.mime_type};base64,${img.image_data || ''}`,
+                    mimeType: img.mime_type,
+                    createdAt: img.created_at
+                })) : [],
+                stats: {
+                    growthRate: Math.floor(Math.random() * 30) + 10,
+                    healthScore: Math.floor(Math.random() * 40) + 60,
+                    leafCount: Math.floor(Math.random() * 20) + 5,
+                    height: parseFloat(apiPost.height) || 0,
+                    colorIntensity: Math.floor(Math.random() * 30) + 70
+                }
+            };
+        }
+
+        function createPostElement(post) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            const date = new Date(post.date).toLocaleDateString('pt-BR');
+            
+            // Check if post has detailed data
+            const hasDetailedData = post.plantAge !== undefined;
+            
+            let detailedInfo = '';
+            if (hasDetailedData) {
+                detailedInfo = `
+                    <div class="post-details">
+                        <div class="detail-row">
+                            <span><strong>Idade:</strong> ${post.plantAge}</span>
+                            <span><strong>Altura:</strong> ${post.height} cm</span>
+                        </div>
+                        <div class="detail-row">
+                            <span><strong>Clima:</strong> ${post.weather}</span>
+                            <span><strong>Temperatura:</strong> ${post.temperature}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span><strong>Regagem:</strong> ${post.watering}</span>
+                            <span><strong>Fertilizante:</strong> ${post.fertilizer}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span><strong>Data do Plantio:</strong> ${post.plantingDate}</span>
+                            <span><strong>Problemas:</strong> ${post.pestProblems}</span>
+                        </div>
+                        ${post.expectedHarvest ? `<div class="detail-row"><span><strong>Colheita Esperada:</strong> ${post.expectedHarvest}</span></div>` : ''}
+                    </div>
+                `;
+            }
+            
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <h4>Análise de ${post.plantType}</h4>
+                    <span class="post-date">${date}</span>
+                </div>
+                <div class="post-content">
+                    ${post.notes ? `<p><strong>Observações:</strong> ${post.notes}</p>` : ''}
+                    ${detailedInfo}
+                    <div class="post-images">
+                        ${post.images.map(img => 
+                            `<img src="${img.url}" alt="${img.name}" class="post-image">`
+                        ).join('')}
+                    </div>
+                </div>
+                <div class="post-stats">
+                    <div class="stat-item">Taxa de Crescimento: ${post.stats.growthRate}%</div>
+                    <div class="stat-item">Saúde: ${post.stats.healthScore}%</div>
+                    <div class="stat-item">Altura: ${post.stats.height}cm</div>
+                    <div class="stat-item">Folhas: ${post.stats.leafCount}</div>
+                </div>
+                <div class="post-footer">
+                    <small>Postado por: ${post.author}</small>
+                </div>
+            `;
+            
+            return postDiv;
+        }
+
+        async function testPostsLoading() {
+            showResult('🔄 Iniciando teste de carregamento de postagens...', 'success');
+            
+            try {
+                // Test API connection
+                showResult('📡 Testando conexão com API...', 'success');
+                const result = await window.hortaAPI.getPosts();
+                
+                if (result.success) {
+                    showResult(`✅ API conectada com sucesso! Encontradas ${result.posts.length} postagens.`, 'success');
+                    
+                    // Transform data
+                    showResult('🔄 Transformando dados da API...', 'success');
+                    const transformedPosts = result.posts.map(transformPostData);
+                    showResult(`✅ Dados transformados com sucesso! ${transformedPosts.length} postagens processadas.`, 'success');
+                    
+                    // Display posts
+                    showResult('🖼️ Renderizando postagens...', 'success');
+                    const container = document.getElementById('postsContainer');
+                    container.innerHTML = '';
+                    
+                    if (transformedPosts.length === 0) {
+                        container.innerHTML = '<p class="no-posts">Nenhuma postagem encontrada.</p>';
+                        showResult('⚠️ Nenhuma postagem para exibir.', 'error');
+                    } else {
+                        transformedPosts.forEach(post => {
+                            const postElement = createPostElement(post);
+                            container.appendChild(postElement);
+                        });
+                        showResult(`✅ ${transformedPosts.length} postagens renderizadas com sucesso!`, 'success');
+                    }
+                    
+                    // Test data structure
+                    showResult('🔍 Testando estrutura de dados...', 'success');
+                    const firstPost = transformedPosts[0];
+                    const requiredFields = ['id', 'plantType', 'plantAge', 'height', 'images', 'stats'];
+                    const missingFields = requiredFields.filter(field => !(field in firstPost));
+                    
+                    if (missingFields.length === 0) {
+                        showResult('✅ Estrutura de dados está correta!', 'success');
+                    } else {
+                        showResult(`❌ Campos faltando: ${missingFields.join(', ')}`, 'error');
+                    }
+                    
+                } else {
+                    showResult(`❌ Erro na API: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ Erro no teste: ${error.message}`, 'error');
+                console.error('Test error:', error);
+            }
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            showResult('🚀 Página carregada. Clique em "Testar Carregamento" para iniciar.', 'success');
+        });
+    </script>
+</body>
+</html>

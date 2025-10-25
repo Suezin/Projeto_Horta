@@ -68,7 +68,8 @@ async function loadPostsFromAPI() {
     try {
         const result = await window.hortaAPI.getPosts();
         if (result.success) {
-            posts = result.posts;
+            // Transform API data to frontend format
+            posts = result.posts.map(transformPostData);
             renderPosts();
             updateStats();
             updateCharts();
@@ -81,6 +82,40 @@ async function loadPostsFromAPI() {
         console.error('Error loading posts:', error);
         showMessage('Erro de conexão ao carregar posts', 'error');
     }
+}
+
+// Transform API data to frontend format
+function transformPostData(apiPost) {
+    return {
+        id: apiPost.id,
+        plantType: apiPost.plant_type,
+        plantAge: apiPost.plant_age,
+        plantingDate: apiPost.planting_date,
+        height: apiPost.height,
+        weather: apiPost.weather,
+        temperature: apiPost.temperature,
+        watering: apiPost.watering,
+        fertilizer: apiPost.fertilizer,
+        pestProblems: apiPost.pest_problems,
+        notes: apiPost.notes,
+        expectedHarvest: apiPost.expected_harvest,
+        author: apiPost.author,
+        date: apiPost.created_at,
+        images: apiPost.images ? apiPost.images.map(img => ({
+            id: img.id,
+            name: img.filename,
+            url: img.url || `data:${img.mime_type};base64,${img.image_data || ''}`,
+            mimeType: img.mime_type,
+            createdAt: img.created_at
+        })) : [],
+        stats: {
+            growthRate: Math.floor(Math.random() * 30) + 10,
+            healthScore: Math.floor(Math.random() * 40) + 60,
+            leafCount: Math.floor(Math.random() * 20) + 5,
+            height: parseFloat(apiPost.height) || 0,
+            colorIntensity: Math.floor(Math.random() * 30) + 70
+        }
+    };
 }
 
 // Legacy functions for backward compatibility

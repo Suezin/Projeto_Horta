@@ -72,6 +72,7 @@ async function getPosts(event, headers) {
             id: 1,
             filename: 'tomate1.jpg',
             mime_type: 'image/jpeg',
+            url: 'https://via.placeholder.com/300x200/4a7c59/ffffff?text=Tomate',
             created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
           }
         ]
@@ -96,6 +97,7 @@ async function getPosts(event, headers) {
             id: 2,
             filename: 'alface1.jpg',
             mime_type: 'image/jpeg',
+            url: 'https://via.placeholder.com/300x200/90ee90/ffffff?text=Alface',
             created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
           }
         ]
@@ -120,6 +122,7 @@ async function getPosts(event, headers) {
             id: 3,
             filename: 'cenoura1.jpg',
             mime_type: 'image/jpeg',
+            url: 'https://via.placeholder.com/300x200/ffa500/ffffff?text=Cenoura',
             created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
           }
         ]
